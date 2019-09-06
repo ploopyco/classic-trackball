@@ -1,0 +1,45 @@
+## Copyright (c) 2019, Ploopy Corporation, a Canadian federal corporation.
+##
+## This is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc.
+## 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ploopymouse.name=Ploopy Mouse
+
+ploopymouse.upload.tool=arduino:avrdude
+ploopymouse.upload.protocol=avr109
+ploopymouse.upload.maximum_size=28672
+ploopymouse.upload.maximum_data_size=2560
+ploopymouse.upload.speed=57600
+ploopymouse.upload.disable_flushing=true
+ploopymouse.upload.use_1200bps_touch=true
+ploopymouse.upload.wait_for_upload_port=true
+
+ploopymouse.bootloader.tool=arduino:avrdude
+ploopymouse.bootloader.unlock_bits=0x3F
+ploopymouse.bootloader.lock_bits=0x2F
+ploopymouse.bootloader.low_fuses=0xFF
+ploopymouse.bootloader.high_fuses=0xD8
+ploopymouse.bootloader.extended_fuses=0xFE
+ploopymouse.bootloader.file=Caterina-Leonardo.hex
+
+ploopymouse.build.board=AVR_PLOOPYMOUSE
+ploopymouse.build.core=arduino:arduino
+ploopymouse.build.variant=arduino:leonardo
+ploopymouse.build.mcu=atmega32u4
+ploopymouse.build.usb_product="Ploopy Mouse"
+ploopymouse.build.vid=0x1209
+ploopymouse.build.pid=0x3A00
+ploopymouse.build.f_cpu=8000000L
+ploopymouse.build.extra_flags={build.usb_flags}

@@ -15,7 +15,7 @@
 ## Foundation, Inc.
 ## 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-ploopymouse.name=Ploopy Mouse
+ploopymouse.name=Ploopy Trackball
 
 ploopymouse.upload.tool=arduino:avrdude
 ploopymouse.upload.protocol=avr109
@@ -34,11 +34,11 @@ ploopymouse.bootloader.high_fuses=0xD8
 ploopymouse.bootloader.extended_fuses=0xFE
 ploopymouse.bootloader.file=Caterina-Leonardo.hex
 
-ploopymouse.build.board=AVR_PLOOPYMOUSE
+ploopymouse.build.board=AVR_PLOOPYTRACKBALL
 ploopymouse.build.core=arduino:arduino
 ploopymouse.build.variant=arduino:leonardo
 ploopymouse.build.mcu=atmega32u4
-ploopymouse.build.usb_product="Ploopy Mouse"
+ploopymouse.build.usb_product="Ploopy Trackball"
 ploopymouse.build.vid=0x1209
 ploopymouse.build.pid=0x3A00
 ploopymouse.build.f_cpu=8000000L

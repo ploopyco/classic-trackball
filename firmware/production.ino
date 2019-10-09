@@ -19,79 +19,50 @@
 
 #include <SPI.h>
 #include <avr/pgmspace.h>
+#include <avr/wdt.h>
 #include "AdvMouse.h"
 
+// Max recommended is 4,000,000, since clock speed is 8MHz.
+// If lower, it should be by factors of 1/2.
+static const int SPIMAXIMUMSPEED = 2000000;
+
+static const int CPI = 1200;
+static const int DEBOUNCE = 10; // ms
+static const int SCROLL_DEBOUNCE = 50; // ms
+static const int SCROLL_BUTT_DEBOUNCE = 100; // ms
+
+static const float ROTATIONAL_TRANSFORM_ANGLE = 20;
+
+static const int MOUSE_LEFT_PIN = 4;
+static const int MOUSE_RIGHT_PIN = 7;
+static const int MOUSE_MIDDLE_PIN = 0;
+static const int MOUSE_BACK_PIN = 9;
+static const int MOUSE_FORWARD_PIN = 6;
+
+// For info, see https://forum.arduino.cc/index.php?topic=241369.0
+static const int SENSOR_CS = 17;
+
+static const int OPT_ENC_PIN1 = A3;
+static const int OPT_ENC_PIN2 = A5;
+
+static const int OPT_LOW_THRESHOLD = 150;
+
+static const byte MOTION = 0x02;
+static const byte DELTA_X_L = 0x03;
+static const byte DELTA_X_H = 0x04;
+static const byte DELTA_Y_L = 0x05;
+static const byte DELTA_Y_H = 0x06;
+static const byte CONFIG1 = 0x0F;
+static const byte CONFIG2 = 0x10;
+static const byte SROM_ENABLE = 0x13;
+static const byte SROM_ID = 0x2A;
+static const byte POWER_UP_RESET = 0x3A;
+static const byte SHUTDOWN = 0x3B;
+static const byte MOTION_BURST = 0x50;
+static const byte SROM_LOAD_BURST = 0x62;
+
 boolean debugMode = false;
-
-const static int CPI = 1200;
-const static int DEBOUNCE = 10; // ms
-
-const static float ROTATIONAL_TRANSFORM_ANGLE = 27.5;
-
-const static int MOUSE_LEFT_PIN = 4;
-const static int MOUSE_RIGHT_PIN = 7;
-const static int MOUSE_MIDDLE_PIN = 0;
-const static int MOUSE_BACK_PIN = 9;
-const static int MOUSE_FORWARD_PIN = 6;
-
-const static int OPT_ENC_PIN1 = A3;
-const static int OPT_ENC_PIN2 = A5;
-
-const static int OPT_LOW_THRESHOLD = 100;
-
-const static byte Product_ID = 0x00;
-const static byte Revision_ID = 0x01;
-const static byte Motion = 0x02;
-const static byte Delta_X_L = 0x03;
-const static byte Delta_X_H = 0x04;
-const static byte Delta_Y_L = 0x05;
-const static byte Delta_Y_H = 0x06;
-const static byte SQUAL = 0x07;
-const static byte Raw_Data_Sum = 0x08;
-const static byte Maximum_Raw_data = 0x09;
-const static byte Minimum_Raw_data = 0x0A;
-const static byte Shutter_Lower = 0x0B;
-const static byte Shutter_Upper = 0x0C;
-const static byte Control = 0x0D;
-const static byte Config1 = 0x0F;
-const static byte Config2 = 0x10;
-const static byte Angle_Tune = 0x11;
-const static byte Frame_Capture = 0x12;
-const static byte SROM_Enable = 0x13;
-const static byte Run_Downshift = 0x14;
-const static byte Rest1_Rate_Lower = 0x15;
-const static byte Rest1_Rate_Upper = 0x16;
-const static byte Rest1_Downshift = 0x17;
-const static byte Rest2_Rate_Lower = 0x18;
-const static byte Rest2_Rate_Upper = 0x19;
-const static byte Rest2_Downshift = 0x1A;
-const static byte Rest3_Rate_Lower = 0x1B;
-const static byte Rest3_Rate_Upper = 0x1C;
-const static byte Observation = 0x24;
-const static byte Data_Out_Lower = 0x25;
-const static byte Data_Out_Upper = 0x26;
-const static byte Raw_Data_Dump = 0x29;
-const static byte SROM_ID = 0x2A;
-const static byte Min_SQ_Run = 0x2B;
-const static byte Raw_Data_Threshold = 0x2C;
-const static byte Config5 = 0x2F;
-const static byte Power_Up_Reset = 0x3A;
-const static byte Shutdown = 0x3B;
-const static byte Inverse_Product_ID = 0x3F;
-const static byte LiftCutoff_Tune3 = 0x41;
-const static byte Angle_Snap = 0x42;
-const static byte LiftCutoff_Tune1 = 0x4A;
-const static byte Motion_Burst = 0x50;
-const static byte LiftCutoff_Tune_Timeout = 0x58;
-const static byte LiftCutoff_Tune_Min_Length = 0x5A;
-const static byte SROM_Load_Burst = 0x62;
-const static byte Lift_Config = 0x63;
-const static byte Raw_Data_Burst = 0x64;
-const static byte LiftCutoff_Tune2 = 0x65;
-
-// Pin 17? WHAA? Curious? See here:
-// https://forum.arduino.cc/index.php?topic=241369.0
-const static int SENSOR_CS = 17;
+boolean wdtMode = false;
 
 float cosTransform;
 float sinTransform;
@@ -111,63 +82,40 @@ int16_t dy;
 unsigned long lastTS;
 unsigned long lastButtonCheck = 0;
 
+unsigned long lastScroll = 0;
+
+unsigned long middleClickRelease = 0;
+
 extern const unsigned short firmware_length;
 extern const unsigned char firmware_data[];
 
 void setup() {
-  if (debugMode) {
-    pinMode(A0, OUTPUT);
-    digitalWrite(A0, HIGH);
-    //delay(5000);
+  if (wdtMode) {
+    setupWDT();
   }
-  
+
+  if (debugMode) {
+    Serial.begin(9600);
+  }
+
   // Startup delay. This sometimes prevents a USB handshake lockup.
   delay(1000);
 
-  Serial.begin(9600);
+  setupPins();
 
-  pinMode(SENSOR_CS, OUTPUT);
-  pinMode(MOUSE_LEFT_PIN, INPUT_PULLUP);
-  pinMode(MOUSE_RIGHT_PIN, INPUT_PULLUP);
-  pinMode(MOUSE_MIDDLE_PIN, INPUT_PULLUP);
-  pinMode(MOUSE_BACK_PIN, INPUT_PULLUP);
-  pinMode(MOUSE_FORWARD_PIN, INPUT_PULLUP);
-
-  pinMode(OPT_ENC_PIN1, INPUT);
-  pinMode(OPT_ENC_PIN2, INPUT);
-
-  // Ground all output pins connected to ground.
-  // This provides additional pathways to ground.
-  // If you're messing with this, know this:
-  // Driving ANY of these pins high will cause a short.
-  // On the MCU.
-  // Ka-blooey.
-  pinMode(1, OUTPUT);
-  pinMode(2, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(13, OUTPUT);
-  pinMode(A1, OUTPUT);
-  pinMode(A2, OUTPUT);
-  pinMode(A4, OUTPUT);
-  digitalWrite(1, LOW);
-  digitalWrite(2, LOW);
-  digitalWrite(8, LOW);
-  digitalWrite(10, LOW);
-  digitalWrite(11, LOW);
-  digitalWrite(12, LOW);
-  digitalWrite(13, LOW);
-  digitalWrite(A1, LOW);
-  digitalWrite(A2, LOW);
-  digitalWrite(A4, LOW);
+  // This is the debug LED.
+  pinMode(A0, OUTPUT);
+  if (debugMode) {
+    digitalWrite(A0, HIGH);
+  } else {
+    digitalWrite(A0, LOW);
+  }
 
   SPI.begin();
   SPI.setDataMode(SPI_MODE3);
   SPI.setBitOrder(MSBFIRST);
 
-  performStartup();
+  initialisePMW3360();
 
   cosTransform = cos(ROTATIONAL_TRANSFORM_ANGLE * PI / 180);
   sinTransform = sin(ROTATIONAL_TRANSFORM_ANGLE * PI / 180);
@@ -188,16 +136,80 @@ void setup() {
   }
 }
 
-void adns_com_begin() {
+void setupWDT() {
+  /* IMPORTANT NOTE!
+   * THIS MUST BE THE FIRST THING THAT RUNS IN SETUP()! If it isn't, there's
+   * a good chance the Arduino will enter an unstable state, and it's entirely
+   * possible that you can permanently brick your MCU!
+   */
+
+  cli();
+
+  // Clear the watchdog reset flag
+  MCUSR &= ~(1 << WDRF);
+
+  // Enter watchdog configuration mode
+  WDTCSR |= (1 << WDCE) |
+            (1 << WDE);
+
+  // WDIE needs to be included, or else this doesn't work.
+  WDTCSR = (1 << WDIE) |
+           (1 << WDE) |
+           (1 << WDP3) |
+           (0 << WDP2) |
+           (0 << WDP1) |
+           (0 << WDP0);
+
+  sei();
+}
+
+void setupPins() {
+  pinMode(SENSOR_CS, OUTPUT);
+  pinMode(MOUSE_LEFT_PIN, INPUT_PULLUP);
+  pinMode(MOUSE_RIGHT_PIN, INPUT_PULLUP);
+  pinMode(MOUSE_MIDDLE_PIN, INPUT_PULLUP);
+  pinMode(MOUSE_BACK_PIN, INPUT_PULLUP);
+  pinMode(MOUSE_FORWARD_PIN, INPUT_PULLUP);
+
+  pinMode(OPT_ENC_PIN1, INPUT);
+  pinMode(OPT_ENC_PIN2, INPUT);
+
+  /* Ground all output pins connected to ground. This provides additional
+   * pathways to ground. If you're messing with this, know this: driving ANY
+   * of these pins high will cause a short. On the MCU. Ka-blooey.
+   */
+  pinMode(1, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(13, OUTPUT);
+  pinMode(A1, OUTPUT);
+  pinMode(A2, OUTPUT);
+  pinMode(A4, OUTPUT);
+  digitalWrite(1, LOW);
+  digitalWrite(2, LOW);
+  digitalWrite(8, LOW);
+  digitalWrite(10, LOW);
+  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  digitalWrite(13, LOW);
+  digitalWrite(A1, LOW);
+  digitalWrite(A2, LOW);
+  digitalWrite(A4, LOW);
+}
+
+void adnsComBegin() {
   digitalWrite(SENSOR_CS, LOW);
 }
 
-void adns_com_end() {
+void adnsComEnd() {
   digitalWrite(SENSOR_CS, HIGH);
 }
 
-byte adns_read_reg(byte reg_addr) {
-  adns_com_begin();
+byte adnsReadReg(byte reg_addr) {
+  adnsComBegin();
 
   // send adress of the register, with MSBit = 0 to indicate it's a read
   SPI.transfer(reg_addr & 0x7f);
@@ -206,15 +218,15 @@ byte adns_read_reg(byte reg_addr) {
 
   // tSCLK-SENSOR_CS for read operation is 120ns
   delayMicroseconds(1);
-  adns_com_end();
+  adnsComEnd();
   // tSRW/tSRR (=20us) minus tSCLK-SENSOR_CS
   delayMicroseconds(19);
 
   return data;
 }
 
-void adns_write_reg(byte reg_addr, byte data) {
-  adns_com_begin();
+void adnsWriteReg(byte reg_addr, byte data) {
+  adnsComBegin();
 
   // send adress of the register, with MSBit = 1 to indicate it's a write
   SPI.transfer(reg_addr | 0x80);
@@ -222,33 +234,78 @@ void adns_write_reg(byte reg_addr, byte data) {
 
   // tSCLK-SENSOR_CS for write operation
   delayMicroseconds(20);
-  adns_com_end();
+  adnsComEnd();
   // tSWW/tSWR (=120us) minus tSCLK-SENSOR_CS.
   // Could be shortened, but this looks like a safe lower-bound.
   delayMicroseconds(100);
 }
 
-void adns_upload_firmware() {
+void setCPI(int cpi) {
+  int cpival = constrain((cpi / 100) - 1, 0, 0x77); // limits to 0--119
+
+  adnsComBegin();
+  adnsWriteReg(CONFIG1, cpival);
+  adnsComEnd();
+
+  if (debugMode) {
+    Serial.print(F("Got "));
+    Serial.println(cpi);
+    Serial.print(F("Set cpi to "));
+    Serial.println((cpival + 1) * 100);
+  }
+}
+
+void initialisePMW3360(void) {
+  if (debugMode) {
+    Serial.println(F("Initialising PMW3360"));
+  }
+
+  // Hard reset. Start by ensuring that the serial port is reset.
+  adnsComEnd();
+  adnsComBegin();
+  adnsComEnd();
+
+  // SHUTDOWN the PMW3360, in case the microcontroller reset but the sensor didn't.
+  adnsWriteReg(SHUTDOWN, 0xb6);
+  delay(300);
+
+  // Drop and raise SENSOR_CS to reset the spi port
+  adnsComBegin();
+  delayMicroseconds(40);
+  adnsComEnd();
+  delayMicroseconds(40);
+
+  // Force a reset of the PMW3360.
+  adnsWriteReg(POWER_UP_RESET, 0x5a);
+  delay(50);
+
+  // Read registers 0x02 through 0x06 (and discard the data)
+  adnsReadReg(MOTION);
+  adnsReadReg(DELTA_X_L);
+  adnsReadReg(DELTA_X_H);
+  adnsReadReg(DELTA_Y_L);
+  adnsReadReg(DELTA_Y_H);
+
   if (debugMode) {
     Serial.println(F("Uploading firmware to PMW3360"));
   }
 
-  // Write 0 to Rest_En bit of Config2 register to disable Rest mode.
-  adns_write_reg(Config2, 0x00);
+  // Write 0 to Rest_En bit of CONFIG2 register to disable Rest mode.
+  adnsWriteReg(CONFIG2, 0x00);
 
   // write 0x1d in SROM_enable reg for initializing
-  adns_write_reg(SROM_Enable, 0x1d);
+  adnsWriteReg(SROM_ENABLE, 0x1d);
 
   // wait for more than one frame period
   // assume that the frame rate is as low as 100fps, even if it should never be that low
   delay(10);
 
   // write 0x18 to SROM_enable to start SROM download
-  adns_write_reg(SROM_Enable, 0x18);
+  adnsWriteReg(SROM_ENABLE, 0x18);
 
   // write burst destination adress
-  adns_com_begin();
-  SPI.transfer(SROM_Load_Burst | 0x80);
+  adnsComBegin();
+  SPI.transfer(SROM_LOAD_BURST | 0x80);
   delayMicroseconds(15);
 
   unsigned char c;
@@ -259,68 +316,24 @@ void adns_upload_firmware() {
   }
 
   // Read the SROM_ID register to verify the ID before any other register reads or writes.
-  adns_read_reg(SROM_ID);
+  adnsReadReg(SROM_ID);
 
-  // Write 0x00 (rest disable) to Config2 register for wired mouse.
+  // Write 0x00 (rest disable) to CONFIG2 register for wired mouse.
   // (If this were a wireless design, it'd be 0x20.)
-  adns_write_reg(Config2, 0x00);
+  adnsWriteReg(CONFIG2, 0x00);
 
-  adns_com_end();
+  adnsComEnd();
 
   if (debugMode) {
     Serial.println(F("Firmware successfully written to PMW3360"));
   }
-}
 
-void setCPI(int cpi) {
-  int cpival = constrain((cpi / 100) - 1, 0, 0x77); // limits to 0--119
-
-  adns_com_begin();
-  adns_write_reg(Config1, cpival);
-  adns_com_end();
-
-  if (debugMode) {
-    Serial.print(F("Got "));
-    Serial.println(cpi);
-    Serial.print(F("Set cpi to "));
-    Serial.println((cpival + 1) * 100);
-  }
-}
-
-void performStartup(void) {
-  // Hard reset. Start by ensuring that the serial port is reset.
-  adns_com_end();
-  adns_com_begin();
-  adns_com_end();
-
-  // Shutdown the PMW3360, in case the microcontroller reset but the sensor didn't.
-  adns_write_reg(Shutdown, 0xb6);
-  delay(300);
-
-  // Drop and raise SENSOR_CS to reset the spi port
-  adns_com_begin();
-  delayMicroseconds(40);
-  adns_com_end();
-  delayMicroseconds(40);
-
-  // Force a reset of the PMW3360.
-  adns_write_reg(Power_Up_Reset, 0x5a);
-  delay(50);
-
-  // Read registers 0x02 through 0x06 (and discard the data)
-  adns_read_reg(Motion);
-  adns_read_reg(Delta_X_L);
-  adns_read_reg(Delta_X_H);
-  adns_read_reg(Delta_Y_L);
-  adns_read_reg(Delta_Y_H);
-
-  adns_upload_firmware();
   delay(10);
 
   setCPI(CPI);
 
   // start burst mode
-  adns_write_reg(Motion_Burst, 0x00);
+  adnsWriteReg(MOTION_BURST, 0x00);
 
   if (debugMode) {
     Serial.println(F("PMW3360 successfully initialized"));
@@ -328,7 +341,7 @@ void performStartup(void) {
 }
 
 
-void check_button_state() {
+void checkButtonState() {
   if (!initComplete)
     return;
 
@@ -355,22 +368,82 @@ void check_button_state() {
       // Either the button is being released, or the debounce time elapsed.
       AdvMouse.release_(buttonKey[i]);
       buttonState[i] = false;
+
+      if (buttonPin[i] == MOUSE_MIDDLE_PIN) {
+        middleClickRelease = micros();
+      }
     }
   }
 }
 
+signed char moveWheel() {
+  // If the mouse wheel was just released, do not scroll.
+  unsigned long elapsed = micros() - middleClickRelease;
+  if (elapsed < SCROLL_BUTT_DEBOUNCE) {
+    return 0;
+  }
+
+  // Limit the number of scrolls per unit time.
+  elapsed = micros() - lastScroll;
+  if (elapsed < SCROLL_DEBOUNCE) {
+    return 0;
+  }
+
+  // Don't scroll if the middle button is depressed.
+  int middleButtonPin = digitalRead(MOUSE_MIDDLE_PIN);
+  if (middleButtonPin == LOW) {
+    return 0;
+  }
+  
+  lastScroll = micros();
+  
+  int d1 = analogRead(OPT_ENC_PIN1);
+  int d2 = analogRead(OPT_ENC_PIN2);
+
+  if (debugMode) {
+    Serial.print(F("d1: "));
+    Serial.print(d1);
+    Serial.print(F(", d2: "));
+    Serial.println(d2);
+  }
+
+  signed char ret = 0;
+
+  if (d1 < OPT_LOW_THRESHOLD && d2 < OPT_LOW_THRESHOLD) {
+    if (firstOptLowPin == OPT_ENC_PIN1) {
+      // scroll down
+      ret = -1;
+    } else if (firstOptLowPin == OPT_ENC_PIN2) {
+      // scroll up
+      ret = 1;
+    }
+
+    firstOptLowPin = 0;
+  } else if (d1 < OPT_LOW_THRESHOLD) {
+    firstOptLowPin = OPT_ENC_PIN1;
+  } else if (d2 < OPT_LOW_THRESHOLD) {
+    firstOptLowPin = OPT_ENC_PIN2;
+  }
+
+  return ret;
+}
+
 void loop() {
+  if (wdtMode) {
+    wdt_reset();
+  }
+
   byte burstBuffer[12];
   unsigned long elapsed = micros() - lastTS;
 
-  check_button_state();
+  checkButtonState();
 
   // polling interval : more than > 0.5 ms.
   if (elapsed > 870) { // 870...whut?
-    adns_com_begin();
-    SPI.beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE3));
+    adnsComBegin();
+    SPI.beginTransaction(SPISettings(SPIMAXIMUMSPEED, MSBFIRST, SPI_MODE3));
 
-    SPI.transfer(Motion_Burst);
+    SPI.transfer(MOTION_BURST);
     // Wait for tSRAD
     delayMicroseconds(35);
 
@@ -400,7 +473,7 @@ void loop() {
     dx -= xPrime;
     dy += yPrime;
 
-    adns_com_end();
+    adnsComEnd();
 
     signed char wheel = moveWheel();
 
@@ -413,29 +486,4 @@ void loop() {
 
     lastTS = micros();
   }
-}
-
-signed char moveWheel() {
-  int d1 = analogRead(OPT_ENC_PIN1);
-  int d2 = analogRead(OPT_ENC_PIN2);
-
-  signed char ret = 0;
-
-  if (d1 < OPT_LOW_THRESHOLD && d2 < OPT_LOW_THRESHOLD) {
-    if (firstOptLowPin == OPT_ENC_PIN1) {
-      // scroll up
-      ret = 1;
-    } else if (firstOptLowPin == OPT_ENC_PIN2) {
-      // scroll down
-      ret = -1;
-    }
-
-    firstOptLowPin = 0;
-  } else if (d1 < OPT_LOW_THRESHOLD) {
-    firstOptLowPin = OPT_ENC_PIN1;
-  } else if (d2 < OPT_LOW_THRESHOLD) {
-    firstOptLowPin = OPT_ENC_PIN2;
-  }
-
-  return ret;
 }

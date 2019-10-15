@@ -1,0 +1,5 @@
+Record=TopLevelDocument|FileName=Vertical.SchDoc
+Record=SheetSymbol|SourceDocument=Vertical.SchDoc|Designator=BBS|SchDesignator=BBS|FileName=BigButtons.SchDoc|SymbolType=Normal|RawFileName=BigButtons.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=SheetSymbol|SourceDocument=Vertical.SchDoc|Designator=MCH|SchDesignator=MCH|FileName=Mechanical.SchDoc|SymbolType=Normal|RawFileName=Mechanical.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=SheetSymbol|SourceDocument=Vertical.SchDoc|Designator=SCW|SchDesignator=SCW|FileName=ScrollWheel.SchDoc|SymbolType=Normal|RawFileName=ScrollWheel.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=SheetSymbol|SourceDocument=Vertical.SchDoc|Designator=VPC|SchDesignator=VPC|FileName=VerticalPCBConnection.SchDoc|SymbolType=Normal|RawFileName=VerticalPCBConnection.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 

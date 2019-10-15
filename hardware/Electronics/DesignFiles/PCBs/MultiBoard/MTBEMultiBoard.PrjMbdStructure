@@ -1,0 +1,4 @@
+Record=DiagramHierarchy|SourceDocument=MTBEClone.MbsDoc|Kind=Multi-board Schematic Module|Designator=1|Source=..\Base\Base.PrjPCB
+Record=SubProject|SourceDocument=MTBEClone.MbsDoc|ProjectPath=..\Base\Base.PrjPCB
+Record=DiagramHierarchy|SourceDocument=MTBEClone.MbsDoc|Kind=Multi-board Schematic Module|Designator=2|Source=..\Vertical\Vertical.PrjPCB
+Record=SubProject|SourceDocument=MTBEClone.MbsDoc|ProjectPath=..\Vertical\Vertical.PrjPCB

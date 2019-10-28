@@ -21,6 +21,7 @@
 #include <avr/pgmspace.h>
 #include <avr/wdt.h>
 #include "AdvMouse.h"
+#include "Scroller.h"
 
 // Max recommended is 4,000,000, since clock speed is 8MHz.
 // If lower, it should be by factors of 1/2.
@@ -28,7 +29,7 @@ static const int SPIMAXIMUMSPEED = 2000000;
 
 static const int CPI = 1200;
 static const int DEBOUNCE = 10; // ms
-static const int SCROLL_DEBOUNCE = 50; // ms
+static const int SCROLL_DEBOUNCE = 100; // ms
 static const int SCROLL_BUTT_DEBOUNCE = 100; // ms
 
 static const float ROTATIONAL_TRANSFORM_ANGLE = 20;
@@ -44,8 +45,6 @@ static const int SENSOR_CS = 17;
 
 static const int OPT_ENC_PIN1 = A3;
 static const int OPT_ENC_PIN2 = A5;
-
-static const int OPT_LOW_THRESHOLD = 150;
 
 static const byte MOTION = 0x02;
 static const byte DELTA_X_L = 0x03;
@@ -72,8 +71,6 @@ bool buttonState[5] = { false, false, false, false, false };
 uint8_t buttonBuffer[5] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 char buttonKey[5] = { MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE, MOUSE_BACK, MOUSE_FORWARD };
 
-int firstOptLowPin;
-
 bool initComplete = false;
 
 int16_t dx;
@@ -85,6 +82,8 @@ unsigned long lastButtonCheck = 0;
 unsigned long lastScroll = 0;
 
 unsigned long middleClickRelease = 0;
+
+static Scroller scroller;
 
 extern const unsigned short firmware_length;
 extern const unsigned char firmware_data[];
@@ -401,31 +400,15 @@ signed char moveWheel() {
   int d2 = analogRead(OPT_ENC_PIN2);
 
   if (debugMode) {
-    Serial.print(F("d1: "));
+    Serial.print(F("th: "));
+    Serial.print(scroller.getScrollThreshold());
+    Serial.print(F(", d1: "));
     Serial.print(d1);
     Serial.print(F(", d2: "));
     Serial.println(d2);
   }
 
-  signed char ret = 0;
-
-  if (d1 < OPT_LOW_THRESHOLD && d2 < OPT_LOW_THRESHOLD) {
-    if (firstOptLowPin == OPT_ENC_PIN1) {
-      // scroll down
-      ret = -1;
-    } else if (firstOptLowPin == OPT_ENC_PIN2) {
-      // scroll up
-      ret = 1;
-    }
-
-    firstOptLowPin = 0;
-  } else if (d1 < OPT_LOW_THRESHOLD) {
-    firstOptLowPin = OPT_ENC_PIN1;
-  } else if (d2 < OPT_LOW_THRESHOLD) {
-    firstOptLowPin = OPT_ENC_PIN2;
-  }
-
-  return ret;
+  return scroller.scroll(d2, d1);
 }
 
 void loop() {

@@ -30,12 +30,17 @@ class Scroller {
     int highA;
     int lowB;
     int highB;
-    int scrollThreshold;
-    int calculateThreshold(int, int);
+    int scrollThresholdA;
+    int scrollThresholdB;
+    int calculateThresholdA(int);
+    int calculateThresholdB(int);
   public:
     Scroller(void);
     int scroll(int, int);
-    int getScrollThreshold(void);
+    int getScrollThresholdA(void);
+    int getScrollThresholdB(void);
+    int al(void);
+    int ah(void);
 };
 
 #endif

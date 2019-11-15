@@ -23,27 +23,29 @@ Scroller::Scroller(void) {
   state = HIHI;
   lohif = false;
   hilof = false;
-  lowA = 50;
-  highA = 150;
-  lowB = 50;
-  highB = 150;
-  calculateThreshold(lowA, lowB);
+  lowA = 1023;
+  highA = 0;
+  lowB = 1023;
+  highB = 0;
+  scrollThresholdA = 0;
+  scrollThresholdB = 0;
 }
 
 int Scroller::scroll(int curA, int curB) {
-  calculateThreshold(curA, curB);
+  calculateThresholdA(curA);
+  calculateThresholdB(curB);
 
   bool LO = false;
   bool HI = true;
   bool sA, sB;
   int ret = 0;
 
-  if (curA < scrollThreshold)
+  if (curA < scrollThresholdA)
     sA = LO;
   else
     sA = HI;
 
-  if (curB < scrollThreshold)
+  if (curB < scrollThresholdB)
     sB = LO;
   else
     sB = HI;
@@ -107,23 +109,36 @@ int Scroller::scroll(int curA, int curB) {
   return ret;
 }
 
-int Scroller::getScrollThreshold(void) {
-  return scrollThreshold;
+int Scroller::getScrollThresholdA(void) {
+  return scrollThresholdA;
 }
 
-int Scroller::calculateThreshold(int curA, int curB) {
+int Scroller::al(void) {
+  return lowA;
+}
+
+int Scroller::ah(void) {
+  return highA;
+}
+
+int Scroller::getScrollThresholdB(void) {
+  return scrollThresholdB;
+}
+
+int Scroller::calculateThresholdA(int curA) {
   if (curA < lowA)
     lowA = curA;
   else if (curA > highA)
     highA = curA;
 
+  scrollThresholdA = ((highA - lowA) / 3) + lowA;
+}
+
+int Scroller::calculateThresholdB(int curB) {
   if (curB < lowB)
     lowB = curB;
   else if (curB > highB)
     highB = curB;
 
-  int avgA = ((highA - lowA) / 3) + lowA;
-  int avgB = ((highB - lowB) / 3) + lowB;
-
-  scrollThreshold = (avgA + avgB) / 2;
+  scrollThresholdB = ((highB - lowB) / 3) + lowB;
 }

@@ -32,7 +32,7 @@ static const int DEBOUNCE = 10; // ms
 static const int SCROLL_DEBOUNCE = 100; // ms
 static const int SCROLL_BUTT_DEBOUNCE = 100; // ms
 
-static const float ROTATIONAL_TRANSFORM_ANGLE = 20;
+static const int8_t ROTATIONAL_TRANSFORM_ANGLE = 20;
 
 static const int MOUSE_LEFT_PIN = 4;
 static const int MOUSE_RIGHT_PIN = 7;
@@ -53,6 +53,7 @@ static const byte DELTA_Y_L = 0x05;
 static const byte DELTA_Y_H = 0x06;
 static const byte CONFIG1 = 0x0F;
 static const byte CONFIG2 = 0x10;
+static const byte ANGLE_TUNE = 0x11;
 static const byte SROM_ENABLE = 0x13;
 static const byte SROM_ID = 0x2A;
 static const byte POWER_UP_RESET = 0x3A;
@@ -62,9 +63,6 @@ static const byte SROM_LOAD_BURST = 0x62;
 
 boolean debugMode = false;
 boolean wdtMode = false;
-
-float cosTransform;
-float sinTransform;
 
 int buttonPin[5] = { MOUSE_LEFT_PIN, MOUSE_RIGHT_PIN, MOUSE_MIDDLE_PIN, MOUSE_BACK_PIN, MOUSE_FORWARD_PIN };
 bool buttonState[5] = { false, false, false, false, false };
@@ -115,9 +113,6 @@ void setup() {
   SPI.setBitOrder(MSBFIRST);
 
   initialisePMW3360();
-
-  cosTransform = cos(ROTATIONAL_TRANSFORM_ANGLE * PI / 180);
-  sinTransform = sin(ROTATIONAL_TRANSFORM_ANGLE * PI / 180);
 
   dx = 0;
   dy = 0;
@@ -321,6 +316,10 @@ void initialisePMW3360(void) {
   // (If this were a wireless design, it'd be 0x20.)
   adnsWriteReg(CONFIG2, 0x00);
 
+  // Rotate the x and y results, since the sensor isn't quite squared up in
+  // the enclosure.
+  adnsWriteReg(ANGLE_TUNE, ROTATIONAL_TRANSFORM_ANGLE);
+
   adnsComEnd();
 
   if (debugMode) {
@@ -447,14 +446,8 @@ void loop() {
     int x = xh << 8 | xl;
     int y = yh << 8 | yl;
 
-    // Rotate the x and y results, since the sensor isn't quite squared up in
-    // the enclosure.
-    // See here: // See here: https://en.wikipedia.org/wiki/Rotation_matrix
-    int xPrime = round(((float) x * cosTransform) - ((float) y * sinTransform));
-    int yPrime = round(((float) x * sinTransform) + ((float) y * cosTransform));
-
-    dx -= xPrime;
-    dy += yPrime;
+    dx -= x;
+    dy += y;
 
     adnsComEnd();
 

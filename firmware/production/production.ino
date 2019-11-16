@@ -416,12 +416,13 @@ void loop() {
   }
 
   byte burstBuffer[12];
-  unsigned long elapsed = micros() - lastTS;
+  unsigned long curTime = micros();
+  unsigned long elapsed = curTime - lastTS;
 
   checkButtonState();
 
   // polling interval : more than > 0.5 ms.
-  if (elapsed > 870) { // 870...whut?
+  if (elapsed >= 1000) {
     adnsComBegin();
     SPI.beginTransaction(SPISettings(SPIMAXIMUMSPEED, MSBFIRST, SPI_MODE3));
 
@@ -460,6 +461,6 @@ void loop() {
       dy = 0;
     }
 
-    lastTS = micros();
+    lastTS = curTime;
   }
 }

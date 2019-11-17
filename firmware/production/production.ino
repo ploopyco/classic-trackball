@@ -318,7 +318,8 @@ void initialisePMW3360(void) {
 
   // Rotate the x and y results, since the sensor isn't quite squared up in
   // the enclosure.
-  adnsWriteReg(ANGLE_TUNE, ROTATIONAL_TRANSFORM_ANGLE);
+  // Sensor rotates up to +/-30 degrees
+  adnsWriteReg(ANGLE_TUNE, constrain(ROTATIONAL_TRANSFORM_ANGLE, -30, 30));
 
   adnsComEnd();
 

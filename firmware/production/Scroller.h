@@ -17,30 +17,51 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#ifndef SCROLLER_AR_SIZE
+#define SCROLLER_AR_SIZE 40
+#endif
+
 #ifndef SCROLLER_h
 #define SCROLLER_h
 
 class Scroller {
   private:
+    const int THRESH_RANGE_LIM = 10;
     enum State { HIHI, HILO, LOLO, LOHI };
     State state;
     bool lohif;
     bool hilof;
     int lowA;
     int highA;
+    bool cLowA;
+    bool cHighA;
+    int lowIndexA;
+    int highIndexA;
+    bool lowOverflowA;
+    bool highOverflowA;
     int lowB;
     int highB;
+    bool cLowB;
+    bool cHighB;
+    int lowIndexB;
+    int highIndexB;
+    bool lowOverflowB;
+    bool highOverflowB;
     int scrollThresholdA;
     int scrollThresholdB;
+    int arLowA[SCROLLER_AR_SIZE];
+    int arHighA[SCROLLER_AR_SIZE];
+    int arLowB[SCROLLER_AR_SIZE];
+    int arHighB[SCROLLER_AR_SIZE];
     int calculateThresholdA(int);
     int calculateThresholdB(int);
+    int calculateThreshold(int, int&, int&, bool&, bool&, int*, int*, int&, int&, bool&, bool&);
+    int thresholdEquation(int, int);
+    void incrementIndex(int&, bool&);
   public:
     Scroller(void);
     int scroll(int, int);
-    int getScrollThresholdA(void);
-    int getScrollThresholdB(void);
-    int al(void);
-    int ah(void);
+    void debug(void);
 };
 
 #endif

@@ -393,15 +393,14 @@ signed char moveWheel() {
   if (middleButtonPin == LOW) {
     return 0;
   }
-  
+
   lastScroll = micros();
-  
+
   int d1 = analogRead(OPT_ENC_PIN1);
   int d2 = analogRead(OPT_ENC_PIN2);
 
   if (debugMode) {
-    Serial.print(F("th: "));
-    Serial.print(scroller.getScrollThreshold());
+    scroller.debug();
     Serial.print(F(", d1: "));
     Serial.print(d1);
     Serial.print(F(", d2: "));

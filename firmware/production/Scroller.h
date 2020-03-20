@@ -18,7 +18,7 @@
  */
 
 #ifndef SCROLLER_AR_SIZE
-#define SCROLLER_AR_SIZE 40
+#define SCROLLER_AR_SIZE 31
 #endif
 
 #ifndef SCROLLER_h

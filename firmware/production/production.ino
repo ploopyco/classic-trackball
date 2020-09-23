@@ -37,7 +37,7 @@ static const int8_t ROTATIONAL_TRANSFORM_ANGLE = 20;
 static const int MOUSE_LEFT_PIN = 4;
 static const int MOUSE_RIGHT_PIN = 7;
 static const int MOUSE_MIDDLE_PIN = 0;
-static const int MOUSE_BACK_PIN = 9;
+static const int MOUSE_BACK_PIN = 10;
 static const int MOUSE_FORWARD_PIN = 6;
 
 // For info, see https://forum.arduino.cc/index.php?topic=241369.0
@@ -99,14 +99,6 @@ void setup() {
   delay(1000);
 
   setupPins();
-
-  // This is the debug LED.
-  pinMode(A0, OUTPUT);
-  if (debugMode) {
-    digitalWrite(A0, HIGH);
-  } else {
-    digitalWrite(A0, LOW);
-  }
 
   SPI.begin();
   SPI.setDataMode(SPI_MODE3);
@@ -175,20 +167,20 @@ void setupPins() {
   pinMode(1, OUTPUT);
   pinMode(2, OUTPUT);
   pinMode(8, OUTPUT);
-  pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(12, OUTPUT);
   pinMode(13, OUTPUT);
+  pinMode(A0, OUTPUT);
   pinMode(A1, OUTPUT);
   pinMode(A2, OUTPUT);
   pinMode(A4, OUTPUT);
   digitalWrite(1, LOW);
   digitalWrite(2, LOW);
   digitalWrite(8, LOW);
-  digitalWrite(10, LOW);
   digitalWrite(11, LOW);
   digitalWrite(12, LOW);
   digitalWrite(13, LOW);
+  digitalWrite(A0, LOW);
   digitalWrite(A1, LOW);
   digitalWrite(A2, LOW);
   digitalWrite(A4, LOW);
@@ -287,6 +279,11 @@ void initialisePMW3360(void) {
   // Write 0 to Rest_En bit of CONFIG2 register to disable Rest mode.
   adnsWriteReg(CONFIG2, 0x00);
 
+  // Rotate the x and y results, since the sensor isn't quite squared up in
+  // the enclosure.
+  // Sensor rotates up to +/-30 degrees
+  adnsWriteReg(ANGLE_TUNE, constrain(ROTATIONAL_TRANSFORM_ANGLE, -30, 30));
+
   // write 0x1d in SROM_enable reg for initializing
   adnsWriteReg(SROM_ENABLE, 0x1d);
 
@@ -315,11 +312,6 @@ void initialisePMW3360(void) {
   // Write 0x00 (rest disable) to CONFIG2 register for wired mouse.
   // (If this were a wireless design, it'd be 0x20.)
   adnsWriteReg(CONFIG2, 0x00);
-
-  // Rotate the x and y results, since the sensor isn't quite squared up in
-  // the enclosure.
-  // Sensor rotates up to +/-30 degrees
-  adnsWriteReg(ANGLE_TUNE, constrain(ROTATIONAL_TRANSFORM_ANGLE, -30, 30));
 
   adnsComEnd();
 

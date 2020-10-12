@@ -1,4 +1,4 @@
-# The Ploopy Trackball
+# [The Ploopy Trackball](https://www.ploopy.co/)
 
 By some stroke of luck, you've made your way here. The Ploopy Trackball. Your life will never be the same.
 

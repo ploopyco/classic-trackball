@@ -6,6 +6,10 @@ This repository contains all of the design and production files necessary to mak
 
 What are you waiting for? Your new life awaits.
 
+## QMK?!
+
+As of November 13th, 2020, kits bought from the [Ploopy store](https://www.ploopy.co/shop/trackball/2) come with QMK preloaded. Check out the Wiki for instructions on how to load new firmware onto your device. (It's super easy!)
+
 ## Under what license is this released?
 
 The firmware is released under GPLv3. The hardware is released under OHL CERN v1.2. Check the respective directories for full license text.

@@ -13,13 +13,15 @@ Designer: [George Bryant](https://github.com/gbrnt) with help and bearing advice
 ## Versions
 ### v3
 This version was designed in Rhino and so isn't really editable for most people. It works well though.
+Print this version if you like seeing the exposed edge of the BTU.
 
 ![A trackball with this mod v3 installed](example-v3.jpg)
 
 ### v4
 This version was redesigned in FreeCAD and the various dimensions are now editable in the FreeCAD file.
+Choose this version if you want the BTU to be covered, or to be able to edit the file.
 
-Currently untested! It might collide with something internally, particularly if you've soldered in a programming header for the microcontroller.
+![A trackball with the v4 mod installed](example-v4.jpg)
 
 ## Buying the BTUs
 The particular BTU this mod is designed for is the Bosch-Rexroth R053010810, or KU-B8-OFK. A set of three is about 20-30 USD, depending on where in the world you are and where you buy them from. Here are some sources we've found so far:

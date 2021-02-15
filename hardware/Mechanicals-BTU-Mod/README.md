@@ -34,19 +34,24 @@ The particular BTU this mod is designed for is the Bosch-Rexroth R053010810, or 
 * For other sources, try Bosch-Rexroth's [contact locator tool](https://addresses.boschrexroth.com/) - find a distributor near you, and search for the bearing part number on their website.
 
 ## Printing
-With a speed of 50-60mm/s, support on the build plate and a layer height of 0.3mm you should get a print time of ~12.5 hours. It may be worth tweaking various settings to reduce it further.
-
-Highly recommended to enable support interface and splitting the support into chunks, as otherwise it can be very hard to remove.
+Follow [Ploopyco's recommendations for print settings](https://github.com/ploopyco/trackball/wiki/Appendix-B%3A-3D-printed-parts). It's also highly recommended to enable support interface and splitting the support into chunks, as otherwise it can be very hard to remove.
 
 ## Assembly
 * Remove all support material from the print.
 * Inspect the holes the BTUs will sit in to make sure there are no lumps inside the hole. File/sand/cut them off if needed.
 * Install the BTUs by pushing them into the holes.
 * Check the BTUs are fully installed by putting the ball on top. It shouldn't scrape on the top surface. If it did one or more of the BTUs might not be fully pushed in.
+* Check that the holes for the threaded inserts are clear (You could carefully drill them out with a 4mm drill bit).
+* Install 4 M3 threaded inserts into the bottom of the part using a soldering iron (see note below).
 * Remove the original top piece from your Ploopy trackball.
 * Remove the secondary button piece, grind off the stop (see below) and reinstall.
 * Install the new top piece on the trackball.
 * Give it a try!
+
+### Threaded inserts
+You'll need 4 heat-set M3 threaded inserts for the screws which attach the top to the base.
+These can be bought from a variety of sources - you should use ones which are made for 4.0 - 4.2mm holes.
+Recommendations for installing these are in the [Ploopy trackball assembly guide](https://github.com/ploopyco/trackball/wiki/Ploopy-Trackball-Kit-Assembly).
 
 ### Modifying secondary buttons
 There is a small tab on the secondary buttons which collides with the closest BTU. It needs to be sanded, filed or cut off. It is indicated in red in the image below:

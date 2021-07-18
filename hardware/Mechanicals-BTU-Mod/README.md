@@ -11,15 +11,17 @@ This mod is a new 3D-printable top piece for the Ploopy which contains holes for
 Designer: [George Bryant](https://github.com/gbrnt) with help and bearing advice from [/u/d4baller](https://reddit.com/user/d4baller)
 
 ## Versions
-### v3
-This version was designed in Rhino and so isn't really editable for most people. It works well though.
-Print this version if you like seeing the exposed edge of the BTU.
+### REVC-BTU
+This version is the version you should use.
+It supports both the original ball and the new larger (45mm) ball.
+
+### v3 and v4
+These versions are too small to fit the new larger ball.
+They've been removed, but you can still find them in the commit history.
+v3 is a non-editable version that exposes the edge of one BTU, and v4 is an editable FreeCAD version.
+Here's what they look like:
 
 ![A trackball with this mod v3 installed](img/example-v3.jpg)
-
-### v4
-This version was redesigned in FreeCAD and the various dimensions are now editable in the FreeCAD file.
-Choose this version if you want the BTU to be covered, or to be able to edit the file.
 
 ![A trackball with the v4 mod installed](img/example-v4.jpg)
 

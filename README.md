@@ -8,7 +8,7 @@ What are you waiting for? Your new life awaits.
 
 ## QMK?!
 
-As of November 13th, 2020, kits bought from the [Ploopy store](https://www.ploopy.co/shop/trackball/2) come with QMK preloaded. Check out the Wiki for instructions on how to load new firmware onto your device. (It's super easy!)
+As of November 13th, 2020, kits bought from the [Ploopy store](https://ploopy.co/product-category/trackball/classic/) come with QMK preloaded. Check out the Wiki for instructions on how to load new firmware onto your device. (It's super easy!)
 
 ## Under what license is this released?
 

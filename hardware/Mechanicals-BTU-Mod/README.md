@@ -9,10 +9,17 @@ Ball transfer units (or BTUs) are omnidirectional bearings, as opposed to the si
 This mod is a new 3D-printable top piece for the Ploopy which contains holes for ball transfer units instead of roller bearings.
 
 Designer: [George Bryant](https://github.com/gbrnt) with help and bearing advice from [/u/d4baller](https://reddit.com/user/d4baller)
-
 ## Versions
+### REVD-BTU
+This version is the version you should use if you have a REV D Ploopy top.
+You can check this on the underside of your original top - there should be a large letter D,
+and your screws will be self-tapping screws.
+It supports both the original ball and the new larger (45mm) ball.
+
 ### REVC-BTU
-This version is the version you should use.
+This version is the version you should use if you have a REV C Ploopy top.
+You can check this on the underside of your original top - there should be a large letter C,
+and your screws will be M3 screws.
 It supports both the original ball and the new larger (45mm) ball.
 
 ### v3 and v4
@@ -50,7 +57,7 @@ Follow [Ploopyco's recommendations for print settings](https://github.com/ploopy
 * Install the new top piece on the trackball.
 * Give it a try!
 
-### Threaded inserts
+### Threaded inserts (Ignore if using REV D)
 You'll need 4 heat-set M3 threaded inserts for the screws which attach the top to the base.
 These can be bought from a variety of sources - you should use ones which are made for 4.0 - 4.2mm holes.
 Recommendations for installing these are in the [Ploopy trackball assembly guide](https://github.com/ploopyco/trackball/wiki/Ploopy-Trackball-Kit-Assembly).

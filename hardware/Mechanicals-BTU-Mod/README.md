@@ -43,6 +43,8 @@ The particular BTU this mod is designed for is the Bosch-Rexroth R053010810, or 
 * [Rodivago](https://rodavigo.net/es/p/bola-transportadora-con-carter-de-metal-laminado-ref-053010810/557053010810) - Spain-based. May require being a company.
 * For other sources, try Bosch-Rexroth's [contact locator tool](https://addresses.boschrexroth.com/) - find a distributor near you, and search for the bearing part number on their website.
 
+(Some people consider buing cheaper nylon BTUs. But they have high internal friction and the ball actually slides on them like on a static bearing, which makes them pointless.)
+
 ## Printing
 Follow [Ploopyco's recommendations for print settings](https://github.com/ploopyco/trackball/wiki/Appendix-B%3A-3D-printed-parts). It's also highly recommended to enable support interface and splitting the support into chunks, as otherwise it can be very hard to remove.
 

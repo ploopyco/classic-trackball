@@ -37,10 +37,13 @@ The particular BTU this mod is designed for is the Bosch-Rexroth R053010810, or 
 
 * [Bosch-Rexroth](https://www.boschrexroth.com/en/xc/products/product-groups/linear-motion-technology/ball-transfer-units-and-tolerance-rings/ball-transfer-units/r0530-with-sheet-steel-housing/r0530-1-with-sheet-steel-housing) - UK and worldwide, but requires you to be a company (e.g. have a VAT number)
 * [Livhaven](https://store.livhaven.com/r053010810-bosch-rexroth-ball-transfer-unit) - US-based. Doesn't require company information, but overseas shipping is expensive.
+* [Uberbearings](https://www.uberbearings.com/R053010810KU-B8-OFK-BOS) - Ships from UK worldwide to private customers. Much cheaper shipping than the other Europe based ones.
 * [L-System](https://l-system.nu/webshop/linear-technology/ball-transfer-units-and-tolerance-rings/ball-transfer-units/type-r0530/ball-transfer-unit-ku-b8-ofk/) - Sweden-based. Might allow private customers to buy.
 * [Spareparts](https://www.sp-spareparts.com/en/p/r053010810-bosch-rexroth) - Ireland-based. Ships to UK and maybe elsewhere. Does sell to private customers.
 * [Rodivago](https://rodavigo.net/es/p/bola-transportadora-con-carter-de-metal-laminado-ref-053010810/557053010810) - Spain-based. May require being a company.
 * For other sources, try Bosch-Rexroth's [contact locator tool](https://addresses.boschrexroth.com/) - find a distributor near you, and search for the bearing part number on their website.
+
+(Some people consider buying cheaper nylon BTUs. But they have high internal friction and the ball actually slides on them like on a static bearing, which makes them pointless.)
 
 ## Printing
 Follow [Ploopyco's recommendations for print settings](https://github.com/ploopyco/trackball/wiki/Appendix-B%3A-3D-printed-parts). It's also highly recommended to enable support interface and splitting the support into chunks, as otherwise it can be very hard to remove.

@@ -45,6 +45,8 @@ The particular BTU this mod is designed for is the Bosch-Rexroth R053010810, or 
 
 (Some people consider buying cheaper nylon BTUs. But they have high internal friction and the ball actually slides on them like on a static bearing, which makes them pointless.)
 
+(NOTE: On Amazon I found "uxcell 8mm BTU 6.6lbs" in a pack of six for 16CAD, listing overall size as 14x10mm and got these to work with the regular BTU mod by adding washers around the BTUs before putting them in the holes. I put 0.7mm thick washer in the hidden holes and one 1mm washer near the right buttons, though maybe 0.8 or 0.9 in all holes would work. I am also adding the STLs for these washers while posting this edit.)
+
 ## Printing
 Follow [Ploopyco's recommendations for print settings](https://github.com/ploopyco/trackball/wiki/Appendix-B%3A-3D-printed-parts). It's also highly recommended to enable support interface and splitting the support into chunks, as otherwise it can be very hard to remove.
 
